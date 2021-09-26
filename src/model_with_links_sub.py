@@ -11,6 +11,9 @@ twist = Twist()
 link = LinkState()
 #print('link: ', link)
 
+# 'steel', 'titanium'
+tiago_model = 'steel'
+
 
 class Block:
     def __init__(self, model_name, link_name):
@@ -25,7 +28,7 @@ class Tiago:
         self._model.model_name = 'tiago'
         self._model.reference_frame = 'world' # 'map', 'world', etc.
 
-    _blockListDict = {
+    _blockListDictTiagoTitanium = {
         'block_1': Block('tiago', 'base_footprint'),
         'block_2': Block('tiago', 'caster_back_left_1_link'),
         'block_3': Block('tiago', 'caster_back_left_2_link'),
@@ -87,31 +90,85 @@ class Tiago:
         'block_59': Block('tiago', 'head_2_link')
     }
 
+    _blockListDictTiagoSteel = {
+    'block_1': Block('tiago', 'base_footprint'),
+    'block_2': Block('tiago', 'caster_back_left_1_link'),
+    'block_3': Block('tiago', 'caster_back_left_2_link'),
+    'block_4': Block('tiago', 'caster_back_right_1_link'),
+    'block_5': Block('tiago', 'caster_back_right_2_link'),
+    'block_6': Block('tiago', 'caster_front_left_1_link'),
+    'block_7': Block('tiago', 'caster_front_left_2_link'),
+    'block_8': Block('tiago', 'caster_front_right_1_link'),
+    'block_9': Block('tiago', 'caster_front_right_2_link'),
+    'block_10': Block('tiago', 'suspension_left_link'),
+    'block_11': Block('tiago', 'wheel_left_link'),
+    'block_12': Block('tiago', 'tiago::suspension_right_link'),
+    'block_13': Block('tiago', 'wheel_right_link'),
+    'block_14': Block('tiago', 'torso_lift_link'),
+    'block_15': Block('tiago', 'arm_1_link'),
+    'block_16': Block('tiago', 'arm_2_link'),
+    'block_17': Block('tiago', 'arm_3_link'),
+    'block_18': Block('tiago', 'arm_4_link'),
+    'block_19': Block('tiago', 'arm_5_link'),
+    'block_20': Block('tiago', 'arm_6_link'),
+    'block_21': Block('tiago', 'arm_7_link'),
+    'block_22': Block('tiago', 'tiago::gripper_left_finger_link'),
+    'block_23': Block('tiago', 'tiago::gripper_right_finger_link'),
+    'block_24': Block('tiago', 'head_1_link'),
+    'block_25': Block('tiago', 'head_2_link')
+    }
+
+
 tiago = Tiago()    
 
 # Define a callback for the LinkStates message
 def link_state_callback(states_msg):
     index = 0
-    for block in tiago._blockListDict.itervalues():
-        link_name = str(block.link_name)
-        for i in range(0, len(states_msg.name)):
-            if states_msg.name[i] == link_name:
-                break
 
-        pose = states_msg.pose[i]
-        #print('pose: ', pose)
+    if tiago_model == 'titanium':
+        for block in tiago._blockListDictTiagoTitanium.itervalues():
+            link_name = str(block.link_name)
+            for i in range(0, len(states_msg.name)):
+                if states_msg.name[i] == link_name:
+                    break
 
-        twist = states_msg.twist[i]
-        #print('twist: ', twist)
+            pose = states_msg.pose[i]
+            #print('pose: ', pose)
 
-        link.link_name = link_name
-        link.pose = pose
-        link.twist = twist
-        link.reference_frame = 'world' # 'map', 'world', etc.    
-        #print('link: ', link)
+            twist = states_msg.twist[i]
+            #print('twist: ', twist)
 
-        tiago._links[index] = link
-        index+=1
+            link.link_name = link_name
+            link.pose = pose
+            link.twist = twist
+            link.reference_frame = 'world' # 'map', 'world', etc.    
+            #print('link: ', link)
+
+            tiago._links[index] = link
+            index+=1
+
+    elif tiago_model == 'steel':
+        for block in tiago._blockListDictTiagoSteel.itervalues():
+            link_name = str(block.link_name)
+            for i in range(0, len(states_msg.name)):
+                if states_msg.name[i] == link_name:
+                    break
+
+            pose = states_msg.pose[i]
+            #print('pose: ', pose)
+
+            twist = states_msg.twist[i]
+            #print('twist: ', twist)
+
+            link.link_name = link_name
+            link.pose = pose
+            link.twist = twist
+            link.reference_frame = 'world' # 'map', 'world', etc.    
+            #print('link: ', link)
+
+            tiago._links[index] = link
+            index+=1
+
     print('tiago._links: ', tiago._links)
     print('\n')    
 

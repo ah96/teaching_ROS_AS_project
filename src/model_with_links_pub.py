@@ -2,12 +2,15 @@ import rospy
 from gazebo_msgs.msg import LinkState, ModelState
 import random
 
+# 'steel', 'titanium'
+tiago_model = 'steel'
+
 class Block:
     def __init__(self, name, relative_entity_name):
         self.model_name = name
         self.link_name = relative_entity_name
 
-blockListDict = {
+blockListDictTiagoTitanium = {
     'block_1': Block('tiago', 'base_footprint'),
     'block_2': Block('tiago', 'caster_back_left_1_link'),
     'block_3': Block('tiago', 'caster_back_left_2_link'),
@@ -69,6 +72,34 @@ blockListDict = {
     'block_59': Block('tiago', 'head_2_link')
 }
 
+blockListDictTiagoSteel = {
+    'block_1': Block('tiago', 'base_footprint'),
+    'block_2': Block('tiago', 'caster_back_left_1_link'),
+    'block_3': Block('tiago', 'caster_back_left_2_link'),
+    'block_4': Block('tiago', 'caster_back_right_1_link'),
+    'block_5': Block('tiago', 'caster_back_right_2_link'),
+    'block_6': Block('tiago', 'caster_front_left_1_link'),
+    'block_7': Block('tiago', 'caster_front_left_2_link'),
+    'block_8': Block('tiago', 'caster_front_right_1_link'),
+    'block_9': Block('tiago', 'caster_front_right_2_link'),
+    'block_10': Block('tiago', 'suspension_left_link'),
+    'block_11': Block('tiago', 'wheel_left_link'),
+    'block_12': Block('tiago', 'tiago::suspension_right_link'),
+    'block_13': Block('tiago', 'wheel_right_link'),
+    'block_14': Block('tiago', 'torso_lift_link'),
+    'block_15': Block('tiago', 'arm_1_link'),
+    'block_16': Block('tiago', 'arm_2_link'),
+    'block_17': Block('tiago', 'arm_3_link'),
+    'block_18': Block('tiago', 'arm_4_link'),
+    'block_19': Block('tiago', 'arm_5_link'),
+    'block_20': Block('tiago', 'arm_6_link'),
+    'block_21': Block('tiago', 'arm_7_link'),
+    'block_22': Block('tiago', 'tiago::gripper_left_finger_link'),
+    'block_23': Block('tiago', 'tiago::gripper_right_finger_link'),
+    'block_24': Block('tiago', 'head_1_link'),
+    'block_25': Block('tiago', 'head_2_link')
+}
+
 
 def link_state_publisher():
     model_pub = rospy.Publisher('/gazebo/set_model_state', ModelState, queue_size=10)
@@ -77,6 +108,11 @@ def link_state_publisher():
 
     rospy.init_node('set_model_with_links_state', anonymous=True)
     rate = rospy.Rate(10) # 10hz
+
+    if tiago_model == 'titanium':
+        blockListDict = blockListDictTiagoTitanium
+    elif tiago_model == 'steel':
+        blockListDict = blockListDictTiagoSteel    
     
     while not rospy.is_shutdown():
         model_state = ModelState()
