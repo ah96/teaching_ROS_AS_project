@@ -6,16 +6,17 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   pal_detection_msgs
+  cv_bridge
+  image_transport
 )
+
+find_package(OpenCV REQUIRED)
 
 catkin_package(
-  CATKIN_DEPENDS pal_detection_msgs roscpp
+  CATKIN_DEPENDS pal_detection_msgs roscpp image_transport cv_bridge
 )
 
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(SYSTEM ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 foreach(dir launch worlds)
     install(DIRECTORY ${dir}/
@@ -26,5 +27,4 @@ install(PROGRAMS scripts/tuck_arm.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 add_executable(get_depth_of_person src/get_depth_of_person.cpp)
-target_link_libraries(get_depth_of_person ${catkin_LIBRARIES})
-#add_dependencies(talker beginner_tutorials_generate_messages_cpp)
+target_link_libraries(get_depth_of_person ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
