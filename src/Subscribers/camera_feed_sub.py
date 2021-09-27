@@ -16,7 +16,7 @@ bridge = CvBridge()
 
 # Define a function to show the image in an OpenCV Window
 def show_image(img):
-    cv2.imshow("Image Window", img)
+    cv2.imshow("Camera feed from TiAGO", img)
     cv2.waitKey(3)
 
 # Define a callback for the Image message
@@ -41,7 +41,7 @@ def image_callback(img_msg):
 sub_image = rospy.Subscriber("/xtion/rgb/image_raw", Image, image_callback)
 
 # Initialize an OpenCV Window named "Image Window"
-cv2.namedWindow("Image Window", 1)
+cv2.namedWindow("Camera feed from TiAGO", 1)
 
 # Loop to keep the program from shutting down unless ROS is shut down, or CTRL+C is pressed
 while not rospy.is_shutdown():
