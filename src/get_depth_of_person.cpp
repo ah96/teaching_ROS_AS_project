@@ -53,6 +53,10 @@ void depthCallback(const sensor_msgs::Image::ConstPtr& msg)
   cv_bridge::CvImageConstPtr cvImgPtr;
   cvImgPtr = cv_bridge::toCvShare(msg);
 
+  std::cout << cvImgPtr->image.cols << " " << cvImgPtr->image.rows << " " << cvImgPtr->image.type() << std::endl;
+
+  std::cout << cvImgPtr->image.at<float>(300,300) << std::endl;
+
   ros::Time _imgTimeStamp = msg->header.stamp;
 
   cv::Mat img(static_cast<int>(cvImgPtr->image.rows),
@@ -61,7 +65,7 @@ void depthCallback(const sensor_msgs::Image::ConstPtr& msg)
 
   cvImgPtr->image.copyTo(img);            
 
-  std::cout << "Image[0,0] = " <<  img.at<int>(0,0) << std::endl;                
+  //std::cout << "Image[0,0] = " <<  img.at<int>(0,0) << std::endl;                
 }
 
 /*
