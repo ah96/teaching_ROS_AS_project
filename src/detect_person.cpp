@@ -10,6 +10,12 @@
 #include <gazebo_msgs/LinkStates.h>
 #include <gazebo_msgs/LinkState.h>
 
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Pose.h>
+
+geometry_msgs::Twist robot_twist;
+geometry_msgs::Pose robot_pose;
+
 ros::Publisher people_pub;
 
 bool isNaN(float num)
@@ -46,7 +52,7 @@ float depth_avg = 0.0, depth_std_dev = 0.0;
 void roiCallback(pal_detection_msgs::Detections2d msg) //const pal_detection_msgs::Detections2d::ConstPtr& msg
 {
 
-  std::cout << std::endl << "empty: " << msg.detections.empty() << std::endl;
+  //std::cout << std::endl << "empty: " << msg.detections.empty() << std::endl;
 
   // if there are no persons detected
   if(msg.detections.empty() == true)
@@ -145,25 +151,47 @@ void depthCallback(const sensor_msgs::Image::ConstPtr& msg)
   }
 
   depth_avg /= num_samples;
-  std::cout << "depth_avg: " << depth_avg << std::endl;
-  std::cout << "num_samples: " << num_samples << std::endl;
+  //std::cout << "depth_avg: " << depth_avg << std::endl;
+  //std::cout << "num_samples: " << num_samples << std::endl;
 
+  float distance_robot_human = depth_avg;
+
+  // calculate position and/or velocity of every person using robot's position and distance between robot and person and add it to the people.people array
   people_msgs::Person person;
   people_msgs::People people;
   people.people.push_back(person);
   people_pub.publish(people);               
 }
 
+void printRobotData(const gazebo_msgs::LinkStates::ConstPtr& msg, int i)
+{
+  std::cout << std::endl << "Link name: " << msg->name[i] << std::endl;
+  std::cout << "Position: " << msg->pose[i].position.x << " " << msg->pose[i].position.y << " " << msg->pose[i].position.z << std::endl; 
+  std::cout << "Linear velocity: " << msg->twist[i].linear.x << " " << msg->twist[i].linear.y << " " << msg->twist[i].linear.z << std::endl;
+}
+
 void robotCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
 {
   int i = -1;
-  std::string link_name = 'tiago::base_footprint';
+  bool found = false;
+  std::string link_name = "tiago::base_footprint";
   for(const auto& str : msg->name) 
   {
     i++;
-    if(str == link_name) break;
+    if(str == link_name) 
+    {
+      found = true;
+      break;
+    }
   }
-  std::cout << "I = " << i << std::endl;            
+  
+  //std::cout << std::endl << "found = " << found << std::endl;
+  //std::cout << "I = " << i << std::endl;
+  //std::cout << msg->name[i] << std::endl;
+  //printRobotData(msg, i);
+
+  robot_pose = msg->pose[i];
+  robot_twist = msg->twist[i];            
 }
 
 int main(int argc, char **argv)

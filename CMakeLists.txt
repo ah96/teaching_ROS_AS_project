@@ -26,5 +26,5 @@ endforeach(dir)
 install(PROGRAMS scripts/tuck_arm.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-add_executable(get_depth_of_person src/get_depth_of_person.cpp)
-target_link_libraries(get_depth_of_person ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_executable(detect_person src/detect_person.cpp)
+target_link_libraries(detect_person ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
