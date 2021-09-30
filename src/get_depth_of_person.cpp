@@ -5,6 +5,12 @@
 #include <iostream>
 #include <typeinfo>
 #include <cv_bridge/cv_bridge.h>
+#include <people_msgs/People.h>
+#include <people_msgs/Person.h>
+#include <gazebo_msgs/LinkStates.h>
+#include <gazebo_msgs/LinkState.h>
+
+ros::Publisher people_pub;
 
 bool isNaN(float num)
 {
@@ -56,6 +62,7 @@ void roiCallback(pal_detection_msgs::Detections2d msg) //const pal_detection_msg
   }
   else
   {
+    /*
     std::cout << "non-empty" << std::endl;
 
     std::cout << "array size: " << sizeof(msg.detections) << std::endl;
@@ -65,7 +72,8 @@ void roiCallback(pal_detection_msgs::Detections2d msg) //const pal_detection_msg
     std::cout << "pal_detection_msgs::Detections2d size: " << sizeof(pal_detection_msgs::Detections2d) << std::endl;
 
     std::cout << "pal_detection_msgs::Detection2d size: " << sizeof(pal_detection_msgs::Detection2d) << std::endl;
-    
+    */
+
     /*
     for(int i = 0; i < 1; i++)
     {
@@ -91,7 +99,7 @@ void roiCallback(pal_detection_msgs::Detections2d msg) //const pal_detection_msg
         roi.height = msg.detections[i].height;
       }
 
-      roi.print();
+      //roi.print();
     } 
   } 
 }
@@ -138,9 +146,25 @@ void depthCallback(const sensor_msgs::Image::ConstPtr& msg)
 
   depth_avg /= num_samples;
   std::cout << "depth_avg: " << depth_avg << std::endl;
-  std::cout << "num_samples: " << num_samples << std::endl;               
+  std::cout << "num_samples: " << num_samples << std::endl;
+
+  people_msgs::Person person;
+  people_msgs::People people;
+  people.people.push_back(person);
+  people_pub.publish(people);               
 }
 
+void robotCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
+{
+  int i = -1;
+  std::string link_name = 'tiago::base_footprint';
+  for(const auto& str : msg->name) 
+  {
+    i++;
+    if(str == link_name) break;
+  }
+  std::cout << "I = " << i << std::endl;            
+}
 
 int main(int argc, char **argv)
 {
@@ -152,6 +176,10 @@ int main(int argc, char **argv)
   ros::Subscriber roi_sub = n.subscribe("/person_detector/detections", 1000, roiCallback);
 
   ros::Subscriber depth_sub = n.subscribe("/xtion/depth_registered/image_raw", 1000, depthCallback);
+
+  ros::Subscriber robot_sub = n.subscribe("/gazebo/link_states", 1000, robotCallback);
+
+  people_pub = n.advertise<people_msgs::People>("/people", 1000);
 
   ros::spin();
 
